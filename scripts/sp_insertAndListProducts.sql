@@ -1,25 +1,29 @@
 CREATE OR REPLACE PROCEDURE sp_insertAndListProducts(
     p_id_producto IN NUMBER,
     p_nombre IN VARCHAR2,
-    p_cursor OUT SYS_REFCURSOR
+    p_fecha_registro IN DATE,
+    p_cursor OUT SYS_REFCURSOR,
+    p_codigo_respuesta OUT NUMBER,
+    p_mensaje_respuesta OUT VARCHAR2
 ) AS
 BEGIN
     -- Insertar el producto
-INSERT INTO productos (id_producto, nombre, fec_registro)
-VALUES (p_id_producto, p_nombre, SYSDATE);
+INSERT INTO productos (id_producto, nombre, fecha_registro)
+VALUES (p_id_producto, p_nombre, p_fecha_registro);
 
--- Consultar productos del día
+-- Consultar lista de productos
 OPEN p_cursor FOR
-SELECT id_producto, nombre, fec_registro
-FROM productos;
+SELECT id_producto, nombre, fecha_registro
+FROM productos order by fecha_registro desc;
 
--- Respuesta exitosa
+-- Respuestas
+p_codigo_respuesta := 0;
+    p_mensaje_respuesta := 'Ejecucion con exito';
 commit;
 EXCEPTION
-    WHEN DUP_VAL_ON_INDEX THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Error: ID de producto duplicado.');
     WHEN OTHERS THEN
         -- En caso de error, hacer rollback
         ROLLBACK;
-            RAISE_APPLICATION_ERROR(-20001, 'Error al gestionar productos: ' || SQLERRM);
+        p_codigo_respuesta := 1;
+        p_mensaje_respuesta := 'Error: ' || SQLCODE || ' - ' || SQLERRM;
 END;

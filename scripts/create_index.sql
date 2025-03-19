@@ -1,1 +1,1 @@
-CREATE INDEX idx_fec_registro ON productos(fec_registro);
+CREATE INDEX idx_fecha_registro ON productos(fec_registro);
