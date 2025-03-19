@@ -1,0 +1,1 @@
+CREATE INDEX idx_fec_registro ON productos(fec_registro);
